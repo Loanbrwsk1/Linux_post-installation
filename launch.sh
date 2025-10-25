@@ -6,6 +6,7 @@ SYSLANG=${LANG:0:2}
 if [[ $SYSLANG == "fr" ]]
 then
     ERROR="Erreur"
+    ERROR_ROOT="vous devez lancer le script avec sudo !" 
     UPDATE_SOURCE="Update des sources"
     UPGRADE_SYSTEM="Upgrade du système"
     YES_OR_NO="[O/n] "
@@ -13,14 +14,17 @@ then
     INSTALL_FLATPAK="Installation de Flatpak"
     INSTALL_FLATHUB="Installation de Flathub"
     NONFREE="Voulez-vous le dépôt non libre ?"
+    ERR_DISTRO="non supporté"
 elif [[ $SYSLANG == "en" ]]
 then
     ERROR="Error"
+    ERROR_ROOT="Error : you should launch the script with sudo !"
     UPDATE_SOURCE="Sources update"
     UPGRADE_SYSTEM="System upgrade"
     YES_OR_NO="[Y/n] "
     FLAT_COMP="Do you want Flatpak and Flathub repo ?"
     NONFREE="Do you want non-free components ?"
+    ERR_DISTRO="non supported"
 fi
 
 ### THANKS FLASHBIOS ###
@@ -79,7 +83,7 @@ error() {
 #? Detect root
 if [[ "$EUID" -ne 0 ]]
 then
-	echo "Erreur : Vous devez lancer en tant que root !"
+	error "$ERROR $ERROR_ROOT"
 	exit 1
 fi
 
@@ -87,45 +91,79 @@ fi
 DIST="$(source /etc/os-release; echo "$ID")"
 
 #? Actions distrib
+fedora() {
+    read -rp "$FLAT_COMP $YES_OR_NO " REPONSE_FLAT
+    if [[ $REPONSE_FLAT == "" ]] ; then
+        REPONSE_FLAT=${REPONSE:-y}
+    fi
+
+    read -rp "$NONFREE $YES_OR_NO " REPONSE_NONFREE
+    if [[ $REPONSE_NONFREE == "" ]] ; then
+        REPONSE_NONFREE=${REPONSE:-y}
+    fi
+
+    (run_with_spinner "dnf -y --refresh upgrade > /dev/null 2>&1" "$UPGRADE_SYSTEM" && success "$UPGRADE_SYSTEM") || error "$ERROR $UPGRADE_SYSTEM"
+
+    if [ "$REPONSE_FLAT" == "y" ] || [ "$REPONSE_FLAT" == "Y" ] || [ "$REPONSE_FLAT" == "o" ] || [ "$REPONSE_FLAT" == "O" ]; then
+        (run_with_spinner "dnf install -y flatpak > /dev/null 2>&1" "$INSTALL_FLATPAK" && success "$INSTALL_FLATPAK") || error "$ERROR $INSTALL_FLATPAK"
+        (run_with_spinner "flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo > /dev/null 2>&1" "$INSTALL_FLATHUB" && success "$INSTALL_FLATHUB") || error "$ERROR $INSTALL_FLATHUB"
+    fi
+    if [ "$REPONSE_NONFREE" == "y" ] || [ "$REPONSE_NONFREE" == "Y" ] || [ "$REPONSE_NONFREE" == "o" ] || [ "$REPONSE_NONFREE" == "O" ]; then
+        echo "nonfree"
+    fi
+    #RPM Fusion
+        #GNOME Logiciels/Discover : appstream
+        #Codec ?
+}
+
+base_ubuntu() {
+    read -rp "$FLAT_COMP $YES_OR_NO " REPONSE_FLAT
+    if [[ $REPONSE_FLAT == "" ]] ; then
+        REPONSE_FLAT=${REPONSE:-y}
+    fi
+
+    (run_with_spinner "apt update > /dev/null 2>&1" "$UPDATE_SOURCE" && success "$UPDATE_SOURCE") || error "$ERROR : $UPDATE_SOURCE"
+    (run_with_spinner "apt -y full-upgrade > /dev/null 2>&1" "$UPGRADE_SYSTEM" && success "$UPGRADE_SYSTEM") || error "$ERROR : $UPGRADE_SYSTEM"
+
+    if [ "$REPONSE_FLAT" == "y" ] || [ "$REPONSE_FLAT" == "Y" ] || [ "$REPONSE_FLAT" == "o" ] || [ "$REPONSE_FLAT" == "O" ]; then
+        (run_with_spinner "apt install -y flatpak > /dev/null 2>&1" "$INSTALL_FLATPAK" && success "$INSTALL_FLATPAK") || error "$ERROR $INSTALL_FLATPAK"
+        (run_with_spinner "flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo > /dev/null 2>&1" "$INSTALL_FLATHUB" && success "$INSTALL_FLATHUB") || error "$ERROR $INSTALL_FLATHUB"
+    fi
+}
+
+opensuse() {
+    read -rp "$FLAT_COMP $YES_OR_NO " REPONSE_FLAT
+    if [[ $REPONSE_FLAT == "" ]] ; then
+            REPONSE_FLAT=${REPONSE:-y}
+    fi
+
+    (run_with_spinner "zypper refresh > /dev/null 2>&1" "$UPDATE_SOURCE" && success "$UPDATE_SOURCE") || error "$ERROR : $UPDATE_SOURCE"
+    (run_with_spinner "zypper update -y > /dev/null 2>&1" "$UPGRADE_SYSTEM" && success "$UPGRADE_SYSTEM") || error "$ERROR : $UPGRADE_SYSTEM"
+
+    if [ "$REPONSE_FLAT" == "y" ] || [ "$REPONSE_FLAT" == "Y" ] || [ "$REPONSE_FLAT" == "o" ] || [ "$REPONSE_FLAT" == "O" ]; then
+        (run_with_spinner "zypper in -y flatpak > /dev/null 2>&1" "$INSTALL_FLATPAK" && success "$INSTALL_FLATPAK") || error "$ERROR $INSTALL_FLATPAK"
+        (run_with_spinner "flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo > /dev/null 2>&1" "$INSTALL_FLATHUB" && success "$INSTALL_FLATHUB") || error "$ERROR $INSTALL_FLATHUB"
+    fi
+}
+
 case "$DIST" in
 	fedora)
-        read -rp "$FLAT_COMP $YES_OR_NO " REPONSE_FLAT
-        REPONSE_FLAT=${REPONSE:-y}
-
-        read -rp "$NONFREE $YES_OR_NO " REPONSE_NONFREE
-        REPONSE_NONFREE=${REPONSE:-y}
-
-		(run_with_spinner "dnf -y --refresh upgrade > /dev/null 2>&1" "$UPGRADE_SYSTEM" && success "$UPGRADE_SYSTEM") || error "$ERROR $UPGRADE_SYSTEM"
-
-        if [ "$REPONSE_FLAT" ] || [ "$REPONSE_FLAT" = "y" ] || [ "$REPONSE_FLAT" = "Y" ] || [ "$REPONSE_FLAT" = "o" ] || [ "$REPONSE_FLAT" = "O" ]; then
-            (run_with_spinner "dnf install -y flatpak > /dev/null 2>&1" "$INSTALL_FLATPAK" && success "$INSTALL_FLATPAK") || error "$ERROR $INSTALL_FLATPAK"
-            (run_with_spinner "flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo > /dev/null 2>&1" "$INSTALL_FLATHUB" && success "$INSTALL_FLATHUB") || error "$ERROR $INSTALL_FLATHUB"
-        fi
-        if [ "$REPONSE_NONFREE" ] || [ "$REPONSE_NONFREE" = "y" ] || [ "$REPONSE_NONFREE" = "Y" ] || [ "$REPONSE_NONFREE" = "o" ] || [ "$REPONSE_NONFREE" = "O" ]; then
-            echo "nonfree"
-        fi
-        #RPM Fusion
-			#GNOME Logiciels/Discover : appstream
-			#Codec ?
+        fedora
 	;;
 	ubuntu)
-        read -rp "$FLAT_COMP $YES_OR_NO " REPONSE_FLAT
-        REPONSE_FLAT=${REPONSE:-y}
-
-        read -rp "$NONFREE $YES_OR_NO " REPONSE_NONFREE
-        REPONSE_NONFREE=${REPONSE:-y}
-
-		(run_with_spinner "apt update > /dev/null 2>&1" "$UPDATE_SOURCE" && success "$UPDATE_SOURCE") || error "$ERROR : $UPDATE_SOURCE"
-		(run_with_spinner "apt -y full-upgrade > /dev/null 2>&1" "$UPGRADE_SYSTEM" && success "$UPGRADE_SYSTEM") || error "$ERROR : $UPGRADE_SYSTEM"
-
-        if [ "$REPONSE_FLAT" ] || [ "$REPONSE_FLAT" = "y" ] || [ "$REPONSE_FLAT" = "Y" ] || [ "$REPONSE_FLAT" = "o" ] || [ "$REPONSE_FLAT" = "O" ]; then
-            (run_with_spinner "apt install -y flatpak > /dev/null 2>&1" "$INSTALL_FLATPAK" && success "$INSTALL_FLATPAK") || error "$ERROR $INSTALL_FLATPAK"
-            (run_with_spinner "flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo > /dev/null 2>&1" "$INSTALL_FLATHUB" && success "$INSTALL_FLATHUB") || error "$ERROR $INSTALL_FLATHUB"
-        fi
+        base_ubuntu
 	;;
+    linuxmint)
+        base_ubuntu
+    ;;
+    zorin)
+        base_ubuntu
+    ;;
+    opensuse-*)
+        opensuse
+    ;;
 	*)
-		echo "Distribution non supportée"
+		error "$ERROR $DIST $ERR_DISTRO"
 		exit 1
-        ;;
+    ;;
 esac
-

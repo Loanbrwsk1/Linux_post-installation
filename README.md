@@ -12,8 +12,11 @@ Script de post-installation qui va mettre à jour le système, installer certain
 
 Distributions supportées :
 
-- Fedora Workstation GNOME
+- Fedora
 - Ubuntu
+- Linux Mint
+- ZorinOS
+- OpenSUSE Tumbleweed & Leap
 
 ### **Lancer le script**
 
