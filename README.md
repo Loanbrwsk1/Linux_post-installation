@@ -1,7 +1,5 @@
 # Linux_post-installation
 
-# **!!!!!!!!!!!!!!!! IN DEVELOPMENT !!!!!!!!!!!!!!!!**
-
 ## [Français](#script-post-installation-linux)
 
 ## [English](#post-install-script-linux)

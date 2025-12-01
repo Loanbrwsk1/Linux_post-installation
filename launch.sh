@@ -67,6 +67,9 @@ elif [[ $SYSLANG == "en" ]] ; then
     ERR_DISTRO="non supported"
     DOWNLOAD_DIR="Downloads"
     PICTURES_DIR="Pictures"
+else
+    echo "Language not supported !"
+    exit 0
 fi
 
 ### THANKS FLASHBIOS ###
@@ -132,7 +135,7 @@ fi
 wallpapers() {
     if [ "$ANSWER_WALLPAPERS" == "y" ] || [ "$ANSWER_WALLPAPERS" == "Y" ] || [ "$ANSWER_WALLPAPERS" == "o" ] || [ "$ANSWER_WALLPAPERS" == "O" ] ; then
         cd /home/$USERNAME/$DOWNLOAD_DIR
-        (run_with_spinner "git clone https://github.com/Loanbrwsk1/Wallpapers.git >> $LOGFILE" "$WALLPAPERS_DOWNLOAD" && success "$WALLPAPERS_DOWNLOAD") || error "$ERROR $WALLPAPERS_DOWNLOAD"
+        (run_with_spinner "git clone https://github.com/Loanbrwsk1/Wallpapers.git >> $LOGFILE 2>&1" "$WALLPAPERS_DOWNLOAD" && success "$WALLPAPERS_DOWNLOAD") || error "$ERROR $WALLPAPERS_DOWNLOAD"
         cd Wallpapers
         if [ "$DE" == "GNOME" ] ; then
             mv ./wallpapers/* ~/.local/share/backgrounds/
@@ -147,7 +150,7 @@ wallpapers() {
 
     if [ "$ANSWER_DYN_WALLPAPERS" == "y" ] || [ "$ANSWER_DYN_WALLPAPERS" == "Y" ] || [ "$ANSWER_DYN_WALLPAPERS" == "o" ] || [ "$ANSWER_WALLPAPERS" == "O" ] ; then
         cd /home/$USERNAME/$DOWNLOAD_DIR
-        (run_with_spinner "git clone https://github.com/Loanbrwsk1/Dynamic-wallpapers.git >> $LOGFILE" "$DYN_WALLPAPERS_DOWNLOAD" && success "$DYN_WALLPAPERS_DOWNLOAD") || error "$ERROR $DYN_WALLPAPERS_DOWNLOAD"
+        (run_with_spinner "git clone https://github.com/Loanbrwsk1/Dynamic-wallpapers.git >> $LOGFILE 2>&1" "$DYN_WALLPAPERS_DOWNLOAD" && success "$DYN_WALLPAPERS_DOWNLOAD") || error "$ERROR $DYN_WALLPAPERS_DOWNLOAD"
         cd ./Dynamic-wallpapers/
         mv ./Dynamic_Wallpapers/ /usr/share/backgrounds/
         if [ "$DE" == "GNOME" ] ; then
@@ -184,49 +187,48 @@ fedora() {
         ANSWER_DOCK=${REPONSE:-y}
     fi
 
-    read -rp "$WALLPAPERS" ANSWER_WALLPAPERS
+    read -rp "$WALLPAPERS $YES_NO " ANSWER_WALLPAPERS
     if [[ $ANSWER_WALLPAPERS == "" ]] ; then
         ANSWER_WALLPAPERS=${REPONSE:-y}
     fi
 
     ANSWER_DYN_WALLPAPERS=${REPONSE:-n}
     if [ "$DE" == "GNOME" ] || [ "$DE" == "CINNAMON" ] ; then
-        read -rp "$DYN_WALLPAPERS" ANSWER_DYN_WALLPAPERS
+        read -rp "$DYN_WALLPAPERS $YES_NO " ANSWER_DYN_WALLPAPERS
         if [[ $ANSWER_DYN_WALLPAPERS == "" ]] ; then
             ANSWER_DYN_WALLPAPERS=${REPONSE:-y}
         fi
     fi
 
-    (run_with_spinner "dnf -y --refresh upgrade >> $LOGFILE" "$UPGRADE_SYSTEM" && success "$UPGRADE_SYSTEM") || error "$ERROR $UPGRADE_SYSTEM"
+    (run_with_spinner "dnf -y --refresh upgrade >> $LOGFILE 2>&1" "$UPGRADE_SYSTEM" && success "$UPGRADE_SYSTEM") || error "$ERROR $UPGRADE_SYSTEM"
 
     if [ "$ANSWER_FLAT" == "y" ] || [ "$ANSWER_FLAT" == "Y" ] || [ "$ANSWER_FLAT" == "o" ] || [ "$ANSWER_FLAT" == "O" ] ; then
-        (run_with_spinner "dnf install -y flatpak >> $LOGFILE" "$INSTALL_FLATPAK" && success "$INSTALL_FLATPAK") || error "$ERROR $INSTALL_FLATPAK"
+        (run_with_spinner "dnf install -y flatpak >> $LOGFILE 2>&1" "$INSTALL_FLATPAK" && success "$INSTALL_FLATPAK") || error "$ERROR $INSTALL_FLATPAK"
         (run_with_spinner "flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >> $LOGFILE" "$INSTALL_FLATHUB" && success "$INSTALL_FLATHUB") || error "$ERROR $INSTALL_FLATHUB"
         install_by_flatpak=true
     fi
 
-    (run_with_spinner "dnf install -y 'https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm' 'https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm' >> $LOGFILE" "$RPM_FUSION_FREE_INSTALL" && success "$RPM_FUSION_FREE_INSTALL") || error "$ERROR $RPM_FUSION_FREE_INSTALL"
+    (run_with_spinner "dnf install -y 'https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm' 'https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm' >> $LOGFILE 2>&1" "$RPM_FUSION_FREE_INSTALL" && success "$RPM_FUSION_FREE_INSTALL") || error "$ERROR $RPM_FUSION_FREE_INSTALL"
     if [ "$ANSWER_NONFREE" == "y" ] || [ "$ANSWER_NONFREE" == "Y" ] || [ "$ANSWER_NONFREE" == "o" ] || [ "$ANSWER_NONFREE" == "O" ] ; then
-        (run_with_spinner "dnf install -y 'https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm' 'https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm' >> $LOGFILE" "$RPM_FUSION_NON_FREE_INSTALL" && success "$RPM_FUSION_NON_FREE_INSTALL") || error "$ERROR $RPM_FUSION_NON_FREE_INSTALL"
+        (run_with_spinner "dnf install -y 'https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm' 'https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm' >> $LOGFILE 2>&1" "$RPM_FUSION_NON_FREE_INSTALL" && success "$RPM_FUSION_NON_FREE_INSTALL") || error "$ERROR $RPM_FUSION_NON_FREE_INSTALL"
     fi
-    
-    (run_with_spinner "dnf install -y libavcodec-freeworld >> $LOGFILE" "$CODECS_INSTALL" && success "$CODECS_INSTALL") || error "$ERROR $CODECS_INSTALL"
+
+    (run_with_spinner "dnf install -y libavcodec-freeworld >> $LOGFILE 2>&1" "$CODECS_INSTALL" && success "$CODECS_INSTALL") || error "$ERROR $CODECS_INSTALL"
 
     if [ "$DE" == "GNOME" ] && { [ "$ANSWER_DOCK" == "y" ] || [ "$ANSWER_DOCK" == "Y" ] || [ "$ANSWER_DOCK" == "o" ] || [ "$ANSWER_DOCK" == "O" ]; } ; then
-        (run_with_spinner "dnf install -y gnome-shell-extension-dash-to-dock >> $LOGFILE" "$DOCK_INSTALL" && success "$DOCK_INSTALL") || error "$ERROR $DOCK_INSTALL"
-        (run_with_spinner "gnome-extensions enable dash-to-dock@micxgx.gmail.com >> $LOGFILE" "$DOCK_ACTIVATION" && success "$DOCK_ACTIVATION") || error "$ERROR $DOCK_ACTIVATION"
+        (run_with_spinner "dnf install -y gnome-shell-extension-dash-to-dock >> $LOGFILE 2>&1" "$DOCK_INSTALL" && success "$DOCK_INSTALL") || error "$ERROR $DOCK_INSTALL"
+        (run_with_spinner "gnome-extensions enable dash-to-dock@micxgx.gmail.com >> $LOGFILE 2>&1" "$DOCK_ACTIVATION" && success "$DOCK_ACTIVATION") || error "$ERROR $DOCK_ACTIVATION"
     fi
 
     if [ "$DE" == "GNOME" ] ; then
-        (run_with_spinner "dnf install -y gnome-tweaks >> $LOGFILE" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
-        (run_with_spinner "gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close' >> $LOGFILE" "$WINDOW_BUTTONS" && success "$WINDOW_BUTTONS") || error "$ERROR $WINDOW_BUTTONS"
+        (run_with_spinner "dnf install -y gnome-tweaks >> $LOGFILE 2>&1" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
+        (run_with_spinner "gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close' >> $LOGFILE 2>&1" "$WINDOW_BUTTONS" && success "$WINDOW_BUTTONS") || error "$ERROR $WINDOW_BUTTONS"
         if [ $install_by_flatpak == true ] ; then
-            (run_with_spinner "flatpak install -y flathub com.mattjakeman.ExtensionManager >> $LOGFILE" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
+            (run_with_spinner "flatpak install -y flathub com.mattjakeman.ExtensionManager >> $LOGFILE 2>&1" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
         fi
     fi
 
     wallpapers
-
 }
 
 base_ubuntu() {
@@ -254,25 +256,25 @@ base_ubuntu() {
         fi
     fi
 
-    (run_with_spinner "apt update >> $LOGFILE" "$UPDATE_SOURCE" && success "$UPDATE_SOURCE") || error "$ERROR : $UPDATE_SOURCE"
-    (run_with_spinner "apt -y full-upgrade >> $LOGFILE" "$UPGRADE_SYSTEM" && success "$UPGRADE_SYSTEM") || error "$ERROR : $UPGRADE_SYSTEM"
+    (run_with_spinner "apt update >> $LOGFILE 2>&1" "$UPDATE_SOURCE" && success "$UPDATE_SOURCE") || error "$ERROR : $UPDATE_SOURCE"
+    (run_with_spinner "apt -y full-upgrade >> $LOGFILE 2>&1" "$UPGRADE_SYSTEM" && success "$UPGRADE_SYSTEM") || error "$ERROR : $UPGRADE_SYSTEM"
 
     if [ "$ANSWER_FLAT" == "y" ] || [ "$ANSWER_FLAT" == "Y" ] || [ "$ANSWER_FLAT" == "o" ] || [ "$ANSWER_FLAT" == "O" ] ; then
-        (run_with_spinner "apt install -y flatpak >> $LOGFILE" "$INSTALL_FLATPAK" && success "$INSTALL_FLATPAK") || error "$ERROR $INSTALL_FLATPAK"
-        (run_with_spinner "flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >> $LOGFILE" "$INSTALL_FLATHUB" && success "$INSTALL_FLATHUB") || error "$ERROR $INSTALL_FLATHUB"
+        (run_with_spinner "apt install -y flatpak >> $LOGFILE 2>&1" "$INSTALL_FLATPAK" && success "$INSTALL_FLATPAK") || error "$ERROR $INSTALL_FLATPAK"
+        (run_with_spinner "flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >> $LOGFILE 2>&1" "$INSTALL_FLATHUB" && success "$INSTALL_FLATHUB") || error "$ERROR $INSTALL_FLATHUB"
         install_by_flatpak=true
     fi
 
     if [ "$DE" == "GNOME" ] ; then
-        (run_with_spinner "apt install -y gnome-tweaks >> $LOGFILE" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
-        (run_with_spinner "gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close' >> $LOGFILE" "$WINDOW_BUTTONS" && success "$WINDOW_BUTTONS") || error "$ERROR $WINDOW_BUTTONS"
+        (run_with_spinner "apt install -y gnome-tweaks >> $LOGFILE 2>&1" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
+        (run_with_spinner "gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close' >> $LOGFILE 2>&1" "$WINDOW_BUTTONS" && success "$WINDOW_BUTTONS") || error "$ERROR $WINDOW_BUTTONS"
         if [ $install_by_flatpak == true ] ; then
-            (run_with_spinner "flatpak install -y flathub com.mattjakeman.ExtensionManager >> $LOGFILE" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
+            (run_with_spinner "flatpak install -y flathub com.mattjakeman.ExtensionManager >> $LOGFILE 2>&1" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
         fi
     fi
 
     if [ "$ANSWER_NVIDIA" == "y" ] || [ "$ANSWER_NVIDIA" == "Y" ] || [ "$ANSWER_NVIDIA" == "o" ] || [ "$ANSWER_NVIDIA" == "O" ] ; then
-        (run_with_spinner "unbuntu-drivers autoinstall >> $LOGFILE" "$NVIDIA_INSTALL" && success "$NVIDIA_INSTALL") || error "$ERROR $NVIDIA_INSTALL"
+        (run_with_spinner "unbuntu-drivers autoinstall >> $LOGFILE 2>&1" "$NVIDIA_INSTALL" && success "$NVIDIA_INSTALL") || error "$ERROR $NVIDIA_INSTALL"
     fi
 
     wallpapers
@@ -298,20 +300,20 @@ opensuse() {
         fi
     fi
 
-    (run_with_spinner "zypper refresh >> $LOGFILE" "$UPDATE_SOURCE" && success "$UPDATE_SOURCE") || error "$ERROR : $UPDATE_SOURCE"
-    (run_with_spinner "zypper update -y >> $LOGFILE" "$UPGRADE_SYSTEM" && success "$UPGRADE_SYSTEM") || error "$ERROR : $UPGRADE_SYSTEM"
+    (run_with_spinner "zypper refresh >> $LOGFILE 2>&1" "$UPDATE_SOURCE" && success "$UPDATE_SOURCE") || error "$ERROR : $UPDATE_SOURCE"
+    (run_with_spinner "zypper update -y >> $LOGFILE 2>&1" "$UPGRADE_SYSTEM" && success "$UPGRADE_SYSTEM") || error "$ERROR : $UPGRADE_SYSTEM"
 
     if [ "$ANSWER_FLAT" == "y" ] || [ "$ANSWER_FLAT" == "Y" ] || [ "$ANSWER_FLAT" == "o" ] || [ "$ANSWER_FLAT" == "O" ] ; then
-        (run_with_spinner "zypper in -y flatpak >> $LOGFILE" "$INSTALL_FLATPAK" && success "$INSTALL_FLATPAK") || error "$ERROR $INSTALL_FLATPAK"
-        (run_with_spinner "flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >> $LOGFILE" "$INSTALL_FLATHUB" && success "$INSTALL_FLATHUB") || error "$ERROR $INSTALL_FLATHUB"
+        (run_with_spinner "zypper in -y flatpak >> $LOGFILE 2>&1" "$INSTALL_FLATPAK" && success "$INSTALL_FLATPAK") || error "$ERROR $INSTALL_FLATPAK"
+        (run_with_spinner "flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >> $LOGFILE 2>&1" "$INSTALL_FLATHUB" && success "$INSTALL_FLATHUB") || error "$ERROR $INSTALL_FLATHUB"
         install_by_flatpak=true
     fi
 
     if [ "$DE" == "GNOME" ] ; then
-        (run_with_spinner "zypper in -y gnome-tweaks >> $LOGFILE" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
-        (run_with_spinner "gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close' >> $LOGFILE" "$WINDOW_BUTTONS" && success "$WINDOW_BUTTONS") || error "$ERROR $WINDOW_BUTTONS"
+        (run_with_spinner "zypper in -y gnome-tweaks >> $LOGFILE 2>&1" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
+        (run_with_spinner "gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close' >> $LOGFILE 2>&1" "$WINDOW_BUTTONS" && success "$WINDOW_BUTTONS") || error "$ERROR $WINDOW_BUTTONS"
         if [ $install_by_flatpak == true ] ; then
-            (run_with_spinner "flatpak install -y flathub com.mattjakeman.ExtensionManager >> $LOGFILE" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
+            (run_with_spinner "flatpak install -y flathub com.mattjakeman.ExtensionManager >> $LOGFILE 2>&1" "$GNOME_TWEAKS_INSTALL" && success "$GNOME_TWEAKS_INSTALL") || error "$ERROR $GNOME_TWEAKS_INSTALL"
         fi
     fi
 
