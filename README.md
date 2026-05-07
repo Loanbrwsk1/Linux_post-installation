@@ -37,7 +37,7 @@ Si vous souhaitez personnalisez votre environnement Linux plus en profondeur, re
 
 ### **Remerciements**
 
-Je tiens à remercier Adrien Linuxtricks dont le code sur lequel j'ai développé est à lui. Voici son [repo](https://github.com/aaaaadrien/linux-postinst). Ainsi qu'à Flashbios qui a participé au projet.
+Je tiens à remercier Adrien Linuxtricks dont le code sur lequel j'ai développé est à lui. Voici son [repo](https://github.com/aaaaadrien/linux-postinst). Ainsi qu'à Flashbios qui a participé au projet. Et voici le [live](https://www.youtube.com/watch?v=d1Oi-jdzKy8&t=10870s) dans lequel il a développé le début de ce script.
 
 ## **Post install script Linux**
 
@@ -72,4 +72,4 @@ If you'd like to further customize your linux environment, check this [playlist]
 
 ### **Thanks**
 
-I would like to thank Adrien Linuxtricks whose code I have developed is his. Here is his [repo](https://github.com/aaaaadrien/linux-postinst). As well as to Flashbios who participated in the project.
+I would like to thank Adrien Linuxtricks whose code I have developed is his. Here is his [repo](https://github.com/aaaaadrien/linux-postinst). As well as to Flashbios who participated in the project. And here is the [live](https://www.youtube.com/watch?v=d1Oi-jdzKy8&t=10870s) in which he developped this script.
