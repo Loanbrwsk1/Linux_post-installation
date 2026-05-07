@@ -19,8 +19,6 @@ Distributions supportées :
 
 ### **Lancer le script**
 
-**_VEUILLEZ AVOIR UNE CONNEXION STABLE ET ASSEZ RAPIDE (min. 2 Mo/s)_**
-
 Lancer le programme :
 
 - Ouvrez l'emplacement du dossier et allez dedans, vous y trouverez un script _launch.sh_
@@ -53,8 +51,6 @@ Supported distros :
 - OpenSUSE
 
 ### **Running the Script**
-
-**_PLEASE ENSURE A STABLE AND FAST CONNECTION (min. 2 MB/s)_**
 
 To run the program:
 
