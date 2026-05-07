@@ -10,7 +10,7 @@ SYSLANG=${LANG:0:2}
 if [[ $SYSLANG == "fr" ]] ; then
     ERROR="Erreur"
     ERROR_ROOT="vous devez lancer le script avec sudo !"
-    LOGS="Vous pouvez voir les logs en exécutant dans un autre terminal : tails -f /tmp/config-progress.log"
+    LOGS="Vous pouvez voir les logs en exécutant dans un autre terminal : tail -f /tmp/config-progress.log"
     UPDATE_SOURCE="Update des sources"
     UPGRADE_SYSTEM="Upgrade du système"
     YES_NO="[O/n] "
@@ -243,7 +243,7 @@ base_ubuntu() {
         ANSWER_NVIDIA=${REPONSE:-y}
     fi
 
-    read -rp "$WALLPAPERS" ANSWER_WALLPAPERS
+    read -rp "$WALLPAPERS $YES_NO " ANSWER_WALLPAPERS
     if [[ $ANSWER_WALLPAPERS == "" ]] ; then
         ANSWER_WALLPAPERS=${REPONSE:-y}
     fi
@@ -287,7 +287,7 @@ opensuse() {
             ANSWER_FLAT=${REPONSE:-y}
     fi
 
-    read -rp "$WALLPAPERS" ANSWER_WALLPAPERS
+    read -rp "$WALLPAPERS $YES_NO " ANSWER_WALLPAPERS
     if [[ $ANSWER_WALLPAPERS == "" ]] ; then
         ANSWER_WALLPAPERS=${REPONSE:-y}
     fi
